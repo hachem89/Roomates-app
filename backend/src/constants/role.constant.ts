@@ -1,0 +1,30 @@
+export const Roles = {
+  OWNER: "OWNER",
+  ADMIN: "ADMIN",
+  MEMBER: "MEMBER",
+} as const;
+
+export type RoleType = (typeof Roles)[keyof typeof Roles];
+
+export const Permissions = {
+  CREATE_HOUSE: "CREATE_HOUSE",
+  DELETE_HOUSE: "DELETE_HOUSE",
+  EDIT_HOUSE: "EDIT_HOUSE",
+  MANAGE_HOUSE_SETTINGS: "MANAGE_HOUSE_SETTINGS",
+
+  ADD_MEMBER: "ADD_MEMBER",
+  CHANGE_MEMBER_ROLE: "CHANGE_MEMBER_ROLE",
+  REMOVE_MEMBER: "REMOVE_MEMBER",
+
+  //   CREATE_PROJECT: "CREATE_PROJECT",
+  //   EDIT_PROJECT: "EDIT_PROJECT",
+  //   DELETE_PROJECT: "DELETE_PROJECT",
+
+  //   CREATE_TASK: "CREATE_TASK",
+  //   EDIT_TASK: "EDIT_TASK",
+  //   DELETE_TASK: "DELETE_TASK",
+
+  VIEW_ONLY: "VIEW_ONLY",
+} as const;
+
+export type PermissionType = (typeof Permissions)[keyof typeof Permissions];
