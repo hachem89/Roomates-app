@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import { config } from "../config/app.config";
 
+// generate access token
 export const generateJWT = (_id: string): string => {
   const token = jwt.sign(
     {
@@ -15,6 +16,7 @@ export const generateJWT = (_id: string): string => {
   return token;
 };
 
+// generate refresh token:
 export const generateRefreshToken = (_id: string): string => {
   const refreshToken = jwt.sign(
     {

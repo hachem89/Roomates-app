@@ -11,6 +11,8 @@ import {
 } from "../utils/appError";
 import MemberModel from "../models/member.model";
 import { ProviderEnum } from "../constants/account-provider.constant";
+import { generateJWT, generateRefreshToken } from "../utils/jwt";
+import RefreshTokenModel from "../models/refreshToken.model";
 
 // this service is for googleStrategy
 export const loginOrCreateAccountService = async (data: {
@@ -183,4 +185,26 @@ export const verifyUserService = async ({
   if (!isMatch) throw new UnauthorizedException("Invalid Email or Password");
 
   return user.omitPassword();
+};
+
+// function that creates the tokens after login/registre:
+export const setTokens = async (userId: string) => {
+  const accessToken = generateJWT(userId);
+  const _refreshToken = generateRefreshToken(userId);
+
+  console.log("access token: ",accessToken);
+  console.log("refresh token: ",_refreshToken);
+
+  // save refresh token to db:
+  const refreshToken = new RefreshTokenModel({
+    userId,
+    token: _refreshToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days in ms
+  });
+  await refreshToken.save();
+
+  return {
+    accessToken,
+    refreshToken: _refreshToken,
+  };
 };
