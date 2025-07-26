@@ -13,7 +13,7 @@ authRoutes.post("/register",registerUserController)
 authRoutes.post("/login", requireLocalAuth ,loginController)
 
 authRoutes.get("/currentUser",requireJwtAuth,async(req:Request,res:Response)=>{
-  const currentUser = req.user?.toJSON()
+  const currentUser = req.user
   res.json({currentUser})
 })
 
