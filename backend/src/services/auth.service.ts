@@ -25,7 +25,7 @@ export const loginOrCreateAccountService = async (data: {
   picture?: string;
   email?: string;
 }) => {
-  console.log("auth.service");
+  
   const { provider, providerId, displayName, picture, email } = data;
 
   const session = await mongoose.startSession();
