@@ -4,11 +4,13 @@ import { config } from "../config/app.config";
 import { registreSchema } from "../validation/auth.validation";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
 import {
+  logoutFromCurrentDeviceService,
   refreshTokenService,
   registerUserService,
   setTokens,
 } from "../services/auth.service";
 import { UnauthorizedException } from "../utils/appError";
+import RefreshTokenModel from "../models/refreshToken.model";
 
 // this is for googleStrategy
 export const googleLoginCallback = asyncHandler(
@@ -71,6 +73,47 @@ export const refreshTokenController = asyncHandler(
     return res.status(HTTPSTATUS.OK).json({
       message: "Token refreshed successfully",
       newAccessToken,
+    });
+  }
+);
+
+// logout:
+// logout from specific device:
+export const logoutFromCurrentDeviceController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException("Refresh Token is required");
+    }
+
+    const { deleted } = await logoutFromCurrentDeviceService({
+      userId,
+      refreshToken,
+    });
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Logged out form this device successfully",
+      deleted,
+    });
+  }
+);
+
+// logout from all devices:
+export const logoutFromAllDevicesController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id;
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException("Refresh Token is required");
+    }
+
+    await RefreshTokenModel.deleteMany({ userId });
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Logged out from all devices successfully",
     });
   }
 );

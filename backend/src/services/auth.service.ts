@@ -241,3 +241,25 @@ export const refreshTokenService = async (refreshToken: string) => {
     newAccessToken,
   };
 };
+
+// logout services:
+export const logoutFromCurrentDeviceService = async ({
+  userId,
+  refreshToken,
+}: {
+  userId: string;
+  refreshToken: string;
+}) => {
+  const deleted = await RefreshTokenModel.findOneAndDelete({
+    userId,
+    token: refreshToken,
+  });
+
+  if (!deleted) {
+    throw new NotFoundException("Refresh Token Not Found");
+  }
+
+  return {
+    deleted
+  }
+};

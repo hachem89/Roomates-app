@@ -4,6 +4,8 @@ import { config } from "../config/app.config";
 import {
   googleLoginCallback,
   loginController,
+  logoutFromAllDevicesController,
+  logoutFromCurrentDeviceController,
   refreshTokenController,
   registerUserController,
 } from "../controllers/auth.controller";
@@ -17,6 +19,16 @@ const authRoutes = Router();
 authRoutes.post("/register", registerUserController);
 authRoutes.post("/login", requireLocalAuth, loginController);
 
+// logout from specific device:
+authRoutes.post(
+  "/logoutDevice",
+  requireJwtAuth,
+  logoutFromCurrentDeviceController
+);
+// logout from all devices:
+authRoutes.post("/logoutAll", requireJwtAuth, logoutFromAllDevicesController);
+
+// enpoint to generate new access token after it expires
 authRoutes.post("/refreshToken", refreshTokenController);
 
 // test route will be removed later
@@ -28,18 +40,6 @@ authRoutes.get(
     res.json({ currentUser });
   }
 );
-
-// authRoutes.get("/:userId",requireJwtAuth, async(req:Request, res:Response)=>{
-//   const userId = req.params.userId
-//   const user = await UserModel.findById(userId)
-//   if(!user) throw new NotFoundException("User not found")
-//     res.json({user})
-// })
-
-// authRoutes.get("/house/:houseId",requireJwtAuth, async(req:Request,res:Response)=>{
-//   const house = await HouseModel.findById(req.params.houseId)
-//   res.json({house})
-// })
 
 // routes for google
 authRoutes.get(
