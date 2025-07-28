@@ -10,6 +10,8 @@ import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import "./config/passport.config";
 import passport from "passport";
 import authRoutes from "./routes/auth.route";
+import userRoutes from "./routes/user.route";
+import requireJwtAuth from "./middlewares/requireJwtAuth.middleware";
 
 const app = express();
 
@@ -37,7 +39,15 @@ app.get(
   })
 );
 
+// google login
+// login
+// registre
+// logout
+// refresh token
 app.use(`${BASE_PATH}/auth`, authRoutes);
+
+// current user
+app.use(`${BASE_PATH}/user`, requireJwtAuth,userRoutes);
 
 app.use(errorHandler);
 

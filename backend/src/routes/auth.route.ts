@@ -31,16 +31,6 @@ authRoutes.post("/logoutAll", requireJwtAuth, logoutFromAllDevicesController);
 // enpoint to generate new access token after it expires
 authRoutes.post("/refreshToken", refreshTokenController);
 
-// test route will be removed later
-authRoutes.get(
-  "/currentUser",
-  requireJwtAuth,
-  async (req: Request, res: Response) => {
-    const currentUser = req.user;
-    res.json({ currentUser });
-  }
-);
-
 // routes for google
 authRoutes.get(
   "/google",

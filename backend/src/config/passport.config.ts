@@ -83,6 +83,7 @@ passport.use(
         const user = await UserModel.findById(payload.id);
 
         if (user) {
+          user.omitPassword();
           done(null, user);
         } else {
           done(null, false);
