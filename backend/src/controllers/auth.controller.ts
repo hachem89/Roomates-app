@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { config } from "../config/app.config";
-import { generateJWT } from "../utils/jwt";
 import { registreSchema } from "../validation/auth.validation";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
-import { registerUserService, setTokens } from "../services/auth.service";
+import {
+  refreshTokenService,
+  registerUserService,
+  setTokens,
+} from "../services/auth.service";
+import { UnauthorizedException } from "../utils/appError";
 
 // this is for googleStrategy
 export const googleLoginCallback = asyncHandler(
@@ -49,6 +53,24 @@ export const loginController = asyncHandler(
       message: "User Logged in Successfully",
       accessToken,
       refreshToken,
+    });
+  }
+);
+
+// refresh token:
+export const refreshTokenController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException("Refresh Token Not Provided");
+    }
+
+    const { newAccessToken } = await refreshTokenService(refreshToken);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Token refreshed successfully",
+      newAccessToken,
     });
   }
 );

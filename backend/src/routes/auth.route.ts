@@ -1,7 +1,12 @@
 import { Request, Response, Router } from "express";
 import passport from "passport";
 import { config } from "../config/app.config";
-import { googleLoginCallback, loginController, registerUserController } from "../controllers/auth.controller";
+import {
+  googleLoginCallback,
+  loginController,
+  refreshTokenController,
+  registerUserController,
+} from "../controllers/auth.controller";
 import requireJwtAuth from "../middlewares/requireJwtAuth.middleware";
 import requireLocalAuth from "../middlewares/requireLocalAuth.middleware";
 
@@ -9,13 +14,20 @@ const failedUrl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`;
 
 const authRoutes = Router();
 
-authRoutes.post("/register",registerUserController)
-authRoutes.post("/login", requireLocalAuth ,loginController)
+authRoutes.post("/register", registerUserController);
+authRoutes.post("/login", requireLocalAuth, loginController);
 
-authRoutes.get("/currentUser",requireJwtAuth,async(req:Request,res:Response)=>{
-  const currentUser = req.user
-  res.json({currentUser})
-})
+authRoutes.post("/refreshToken", refreshTokenController);
+
+// test route will be removed later
+authRoutes.get(
+  "/currentUser",
+  requireJwtAuth,
+  async (req: Request, res: Response) => {
+    const currentUser = req.user;
+    res.json({ currentUser });
+  }
+);
 
 // authRoutes.get("/:userId",requireJwtAuth, async(req:Request, res:Response)=>{
 //   const userId = req.params.userId
@@ -29,6 +41,7 @@ authRoutes.get("/currentUser",requireJwtAuth,async(req:Request,res:Response)=>{
 //   res.json({house})
 // })
 
+// routes for google
 authRoutes.get(
   "/google",
   passport.authenticate("google", {

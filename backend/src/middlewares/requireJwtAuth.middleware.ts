@@ -27,7 +27,7 @@ const requireJwtAuth = (req: Request, res: Response, next: NextFunction) => {
         } else if (info?.message === "jwt malformed") {
           message = "Invalid token format";
         } else if (info?.message === "invalid signature") {
-          message = "Token has invalid signature hahahahaha";
+          message = "Token has invalid signature";
         } else if (info?.message === "jwt expired") {
           message = "Token has expired, please log in again.";
         }

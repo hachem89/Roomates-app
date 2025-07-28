@@ -10,6 +10,7 @@ export const ErrorCodeEnum = {
 
   // Access Control Errors
   ACCESS_UNAUTHORIZED: "ACCESS_UNAUTHORIZED",
+  ACCESS_FORBIDDEN: "ACCESS_FORBIDDEN",
 
   // Validation and Resource Errors
   VALIDATION_ERROR: "VALIDATION_ERROR",
@@ -19,4 +20,5 @@ export const ErrorCodeEnum = {
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
 } as const;
 
-export type ErrorCodeEnumType =  (typeof ErrorCodeEnum)[keyof typeof ErrorCodeEnum];
+export type ErrorCodeEnumType =
+  (typeof ErrorCodeEnum)[keyof typeof ErrorCodeEnum];

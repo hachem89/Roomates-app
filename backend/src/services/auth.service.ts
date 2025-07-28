@@ -6,6 +6,7 @@ import RoleModel from "../models/roles-permission.model";
 import { Roles } from "../constants/role.constant";
 import {
   BadRequestException,
+  ForbiddenException,
   NotFoundException,
   UnauthorizedException,
 } from "../utils/appError";
@@ -13,6 +14,8 @@ import MemberModel from "../models/member.model";
 import { ProviderEnum } from "../constants/account-provider.constant";
 import { generateJWT, generateRefreshToken } from "../utils/jwt";
 import RefreshTokenModel from "../models/refreshToken.model";
+import jwt from "jsonwebtoken";
+import { config } from "../config/app.config";
 
 // this service is for googleStrategy
 export const loginOrCreateAccountService = async (data: {
@@ -192,9 +195,6 @@ export const setTokens = async (userId: string) => {
   const accessToken = generateJWT(userId);
   const _refreshToken = generateRefreshToken(userId);
 
-  console.log("access token: ",accessToken);
-  console.log("refresh token: ",_refreshToken);
-
   // save refresh token to db:
   const refreshToken = new RefreshTokenModel({
     userId,
@@ -206,5 +206,38 @@ export const setTokens = async (userId: string) => {
   return {
     accessToken,
     refreshToken: _refreshToken,
+  };
+};
+
+// refreshToken service:
+export const refreshTokenService = async (refreshToken: string) => {
+  // find the refresh token in the db:
+  const storedRefreshToken = await RefreshTokenModel.findOne({
+    token: refreshToken,
+  });
+  if (!storedRefreshToken) {
+    throw new ForbiddenException("Refresh token invalid or not found");
+  }
+
+  // check if expired:
+  if (storedRefreshToken.expiresAt < new Date()) {
+    await storedRefreshToken.deleteOne();
+    throw new ForbiddenException("Refresh Token expired");
+  }
+
+  // optionally, verify the token itself:
+  let payload;
+  try {
+    payload = jwt.verify(refreshToken, config.JWT_REFRESH_SECRET);
+  } catch (error) {
+    throw new ForbiddenException("Invalid refresh token");
+  }
+
+  const userId = storedRefreshToken.userId.toString();
+
+  const newAccessToken = generateJWT(userId);
+
+  return {
+    newAccessToken,
   };
 };
