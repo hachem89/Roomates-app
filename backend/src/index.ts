@@ -12,6 +12,7 @@ import passport from "passport";
 import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.route";
 import requireJwtAuth from "./middlewares/requireJwtAuth.middleware";
+import houseRoutes from "./routes/house.route";
 
 const app = express();
 
@@ -48,6 +49,17 @@ app.use(`${BASE_PATH}/auth`, authRoutes);
 
 // current user
 app.use(`${BASE_PATH}/user`, requireJwtAuth,userRoutes);
+
+// create new house
+// update house
+// get house by id
+// get all the houses of a member
+// get the house members
+// get house analytics
+// change house member role
+// delete house
+app.use(`${BASE_PATH}/house`, requireJwtAuth,houseRoutes);
+
 
 app.use(errorHandler);
 
