@@ -12,6 +12,7 @@ import {
 
 const houseRoutes = Router();
 
+// done
 houseRoutes.post("/create/new", createHouseController);
 
 houseRoutes.put("/update/:houseId", updateHouseByIdController);
@@ -29,6 +30,7 @@ houseRoutes.get("/members/:houseId", getHouseMembersController);
 
 houseRoutes.get("/analytics/:houseId", getHouseAnalyticsController);
 
+// done 
 houseRoutes.get("/:houseId", getHouseByIdController);
 
 export default houseRoutes;

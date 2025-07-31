@@ -50,3 +50,24 @@ export const createHouseService = async (
     house,
   };
 };
+
+export const getHouseByIdService = async (houseId: string) => {
+  const house = await HouseModel.findById(houseId);
+  if (!house) {
+    throw new NotFoundException("House not found");
+  }
+
+  // populate the house with the members:
+  const members = await MemberModel.find({
+    houseId,
+  }).populate("role");
+
+  const houseWithMembers = {
+    ...house.toObject(),
+    members,
+  };
+
+  return {
+    house: houseWithMembers,
+  };
+};
