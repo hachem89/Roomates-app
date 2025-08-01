@@ -81,3 +81,18 @@ export const getAllHousesUserIsMemberService = async (userId: string) => {
 
   return { houses };
 };
+
+export const getHouseMembersService = async (houseId: string) => {
+  const members = await MemberModel.find({ houseId })
+    .populate("userId", "name email profilePicture -password")
+    .populate("role", "name");
+
+  // we need roles also in the response because we want to  Display role labels or building dropdowns to change a member role
+  const roles = await RoleModel.find({}, { name: 1, _id: 1 }) //Equivalent to: .select("name _id").
+    .lean(); //It tells Mongoose to return plain JavaScript objects instead of full Mongoose documents.
+
+  return {
+    members,
+    roles,
+  };
+};

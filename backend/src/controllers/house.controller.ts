@@ -5,8 +5,10 @@ import {
   houseIdSchema,
 } from "../validation/house.validation";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
-import { createHouseService, getAllHousesUserIsMemberService, getHouseByIdService } from "../services/house.service";
+import { createHouseService, getAllHousesUserIsMemberService, getHouseByIdService, getHouseMembersService } from "../services/house.service";
 import { getMemberRoleInHouse } from "../services/member.service";
+import { Permissions } from "../constants/role.constant";
+import { roleGuard } from "../utils/roleGuard";
 
 export const createHouseController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -54,7 +56,21 @@ export const getAllHousesUserIsMemberController = asyncHandler(
 );
 
 export const getHouseMembersController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const houseId = houseIdSchema.parse(req.params.houseId)
+    const userId = req.user?._id
+
+    const {role} = await getMemberRoleInHouse(userId,houseId)
+    roleGuard(role, [Permissions.VIEW_ONLY])
+    
+    const {members, roles} = await getHouseMembersService(houseId)
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "House members fetched successfully",
+      members,
+      roles
+    })
+  }
 );
 
 export const getHouseAnalyticsController = asyncHandler(

@@ -27,11 +27,12 @@ houseRoutes.delete("/delete/:houseId", deleteHouseByIdController);
 // done
 houseRoutes.get("/all", getAllHousesUserIsMemberController);
 
+// done
 houseRoutes.get("/members/:houseId", getHouseMembersController);
-
-houseRoutes.get("/analytics/:houseId", getHouseAnalyticsController);
 
 // done 
 houseRoutes.get("/:houseId", getHouseByIdController);
+
+houseRoutes.get("/analytics/:houseId", getHouseAnalyticsController);
 
 export default houseRoutes;
