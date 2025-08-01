@@ -24,6 +24,7 @@ houseRoutes.put(
 
 houseRoutes.delete("/delete/:houseId", deleteHouseByIdController);
 
+// done
 houseRoutes.get("/all", getAllHousesUserIsMemberController);
 
 houseRoutes.get("/members/:houseId", getHouseMembersController);

@@ -71,3 +71,13 @@ export const getHouseByIdService = async (houseId: string) => {
     house: houseWithMembers,
   };
 };
+
+export const getAllHousesUserIsMemberService = async (userId: string) => {
+  const memberships = await MemberModel.find({ userId })
+    .populate("houseId")
+    .exec(); // optional, but good practice. It turns the query into a real Promise and avoids surprises.
+
+  const houses = memberships.map((membership) => membership.houseId);
+
+  return { houses };
+};

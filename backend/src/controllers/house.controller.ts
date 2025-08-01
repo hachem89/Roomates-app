@@ -5,7 +5,7 @@ import {
   houseIdSchema,
 } from "../validation/house.validation";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
-import { createHouseService, getHouseByIdService } from "../services/house.service";
+import { createHouseService, getAllHousesUserIsMemberService, getHouseByIdService } from "../services/house.service";
 import { getMemberRoleInHouse } from "../services/member.service";
 
 export const createHouseController = asyncHandler(
@@ -41,7 +41,16 @@ export const getHouseByIdController = asyncHandler(
 );
 
 export const getAllHousesUserIsMemberController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const userId = req.user?._id
+
+    const {houses} = await getAllHousesUserIsMemberService(userId)
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "All Houses fetched successfully",
+      houses
+    })
+  }
 );
 
 export const getHouseMembersController = asyncHandler(
