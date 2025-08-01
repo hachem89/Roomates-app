@@ -14,7 +14,7 @@ const houseRoutes = Router();
 
 // done
 houseRoutes.post("/create/new", createHouseController);
-
+// done
 houseRoutes.put("/update/:houseId", updateHouseByIdController);
 
 houseRoutes.put(
