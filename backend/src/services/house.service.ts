@@ -96,3 +96,23 @@ export const getHouseMembersService = async (houseId: string) => {
     roles,
   };
 };
+
+export const updateHouseByIdService = async (
+  houseId: string,
+  name: string,
+  description?: string
+) => {
+  const house = await HouseModel.findById(houseId);
+
+  if (!house) {
+    throw new NotFoundException("House not found");
+  }
+
+  house.name = name || house.name;
+  house.description = description || house.description;
+  await house.save();
+
+  return {
+    house,
+  };
+};
