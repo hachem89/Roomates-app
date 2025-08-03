@@ -1,12 +1,14 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import {
+  changeRoleSchema,
   createHouseSchema,
   houseIdSchema,
   updateHouseSchema,
 } from "../validation/house.validation";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
 import {
+  changeHouseMemberRoleService,
   createHouseService,
   getAllHousesUserIsMemberService,
   getHouseByIdService,
@@ -104,7 +106,26 @@ export const updateHouseByIdController = asyncHandler(
 );
 
 export const changeHouseMemberRoleController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const houseId = houseIdSchema.parse(req.params.houseId);
+    const { memberId, roleId } = changeRoleSchema.parse(req.body);
+
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.CHANGE_MEMBER_ROLE]);
+
+    const { member } = await changeHouseMemberRoleService(
+      houseId,
+      memberId,
+      roleId
+    );
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Member role changed successfully",
+      member,
+    });
+  }
 );
 
 export const deleteHouseByIdController = asyncHandler(

@@ -13,6 +13,7 @@ import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.route";
 import requireJwtAuth from "./middlewares/requireJwtAuth.middleware";
 import houseRoutes from "./routes/house.route";
+import memberRoutes from "./routes/member.route";
 
 const app = express();
 
@@ -60,6 +61,8 @@ app.use(`${BASE_PATH}/user`, requireJwtAuth,userRoutes);
 // delete house
 app.use(`${BASE_PATH}/house`, requireJwtAuth,houseRoutes);
 
+// join house by invite code
+app.use(`${BASE_PATH}/member`, requireJwtAuth,memberRoutes);
 
 app.use(errorHandler);
 

@@ -116,3 +116,30 @@ export const updateHouseByIdService = async (
     house,
   };
 };
+
+export const changeHouseMemberRoleService = async (
+  houseId: string,
+  memberId: string,
+  roleId: string
+) => {
+  const member = await MemberModel.findOne({
+    userId: memberId,
+    houseId,
+  });
+
+  if(!member){
+    throw new Error("Member not found in the house")
+  }
+
+  const role = await RoleModel.findById(roleId)
+  if(!role){
+    throw new NotFoundException("Role not found")
+  }
+
+  member.role = role
+  await member.save()
+
+  return{
+    member
+  }
+};
