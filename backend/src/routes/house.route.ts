@@ -17,11 +17,13 @@ houseRoutes.post("/create/new", createHouseController);
 // done
 houseRoutes.put("/update/:houseId", updateHouseByIdController);
 
+// done
 houseRoutes.put(
   "/change/member/role/:houseId",
   changeHouseMemberRoleController
 );
 
+// done
 houseRoutes.delete("/delete/:houseId", deleteHouseByIdController);
 
 // done

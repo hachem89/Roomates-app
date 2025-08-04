@@ -10,6 +10,7 @@ import { HTTPSTATUS } from "../constants/httpStatus.constant";
 import {
   changeHouseMemberRoleService,
   createHouseService,
+  deleteHouseByIdService,
   getAllHousesUserIsMemberService,
   getHouseByIdService,
   getHouseMembersService,
@@ -129,5 +130,18 @@ export const changeHouseMemberRoleController = asyncHandler(
 );
 
 export const deleteHouseByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const houseId = houseIdSchema.parse(req.params.houseId)
+    const userId = req.user?._id
+
+    const {role} = await getMemberRoleInHouse(userId, houseId)
+    roleGuard(role, [Permissions.DELETE_HOUSE])
+
+    const {currentHouse} = await deleteHouseByIdService(houseId, userId )
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "House deleted successfully",
+      currentHouse
+    })
+  }
 );

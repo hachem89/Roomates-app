@@ -29,7 +29,7 @@ const memberSchema = new Schema<MemberDocument>(
       type: Date,
       default: Date.now,
     },
-  },
+  },  
   {
     timestamps: true,
   }

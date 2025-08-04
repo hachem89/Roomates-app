@@ -127,19 +127,69 @@ export const changeHouseMemberRoleService = async (
     houseId,
   });
 
-  if(!member){
-    throw new Error("Member not found in the house")
+  if (!member) {
+    throw new Error("Member not found in the house");
   }
 
-  const role = await RoleModel.findById(roleId)
-  if(!role){
-    throw new NotFoundException("Role not found")
+  const role = await RoleModel.findById(roleId);
+  if (!role) {
+    throw new NotFoundException("Role not found");
   }
 
-  member.role = role
-  await member.save()
+  member.role = role;
+  await member.save();
 
-  return{
-    member
+  return {
+    member,
+  };
+};
+
+export const deleteHouseByIdService = async (
+  houseId: string,
+  userId: string
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const house = await HouseModel.findById(houseId).session(session);
+    if (!house) {
+      throw new NotFoundException("House not found");
+    }
+
+    // Check if the user owns the house
+    // if (!house.owner.equals(new mongoose.Types.ObjectId(userId))) {
+    //   throw new BadRequestException(
+    //     "You are not authorized to delete this house"
+    //   );
+    // }
+
+    const user = await UserModel.findById(userId).session(session);
+    if (!user) {
+      throw new NotFoundException("User not found");
+    }
+
+    await MemberModel.deleteMany({ houseId }).session(session);
+
+    // Update the user's currentWorkspace if it matches the deleted workspace
+    if (user.currentHouse?.equals(houseId)) {
+      const memberHouse = await MemberModel.findOne({ userId }).session(
+        session
+      );
+      user.currentHouse = memberHouse ? memberHouse.houseId : null;
+      await user.save({ session });
+    }
+
+    await house.deleteOne({ session });
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      currentHouse: user.currentHouse,
+    };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
 };
