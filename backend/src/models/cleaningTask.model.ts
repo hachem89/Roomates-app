@@ -1,6 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import {
   CleaningTasks,
+  CleaningTaskStatus,
+  CleaningTaskStatusType,
   CleaningTasksType,
 } from "../constants/cleaningTask.constant";
 import { generateTaskCode } from "../utils/uuid";
@@ -11,7 +13,7 @@ export interface CleaningTaskDocument extends Document {
   assignedTo: mongoose.Types.ObjectId[];
   houseId: mongoose.Types.ObjectId;
   date: Date;
-  isCompleted: boolean;
+  status: CleaningTaskStatusType;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,10 +45,11 @@ const cleaningTasksSchema = new Schema<CleaningTaskDocument>(
       type: Date,
       required: true,
     },
-    isCompleted: {
-      type: Boolean,
+    status: {
+      type: String,
+      enum: Object.values(CleaningTaskStatus),
       required: true,
-      default: false,
+      default: CleaningTaskStatus.TODO,
     },
   },
   {
@@ -60,4 +63,3 @@ const CleaningTaskModel = mongoose.model<CleaningTaskDocument>(
 );
 
 export default CleaningTaskModel;
-
