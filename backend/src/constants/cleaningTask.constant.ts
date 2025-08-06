@@ -1,3 +1,8 @@
+export const CleaningTaskStatus = {
+  TODO: "TODO",
+  DONE: "DONE",
+} as const;
+
 export const CleaningTasks = {
   CLEAN_TOILET: "Clean the toilet",
   CLEAN_BATHROOM: "Clean the bathroom",
@@ -10,3 +15,6 @@ export const CleaningTasks = {
 
 export type CleaningTasksType =
   (typeof CleaningTasks)[keyof typeof CleaningTasks];
+
+export type CleaningTaskStatusType =
+  (typeof CleaningTaskStatus)[keyof typeof CleaningTaskStatus];
