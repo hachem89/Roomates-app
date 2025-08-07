@@ -5,7 +5,27 @@ import { getMemberRoleInHouse } from "../services/member.service";
 import { roleGuard } from "../utils/roleGuard";
 import { Permissions } from "../constants/role.constant";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
-import { getAllCleaningTasksInHouseService } from "../services/cleaningTask.service";
+import { createCleaningTaskService, getAllCleaningTasksInHouseService } from "../services/cleaningTask.service";
+import { createCleaningTaskSchema } from "../validation/cleaningTask.validation";
+
+export const createCleaningTaskController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const houseId = houseIdSchema.parse(req.params.houseId);
+    const userId = req.user?._id;
+
+    const body = createCleaningTaskSchema.parse(req.body);
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.CREATE_CLEANING_TASK]);
+
+    const { cleaningTask } = await createCleaningTaskService(houseId, body);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Task created successfully",
+      cleaningTask,
+    });
+  }
+);
 
 export const getAllCleaningTasksInHouseController = asyncHandler(
   async (req: Request, res: Response) => {

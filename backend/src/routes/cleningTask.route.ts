@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { getAllCleaningTasksInHouseController } from "../controllers/cleningTask.controller";
+import { createCleaningTaskController, getAllCleaningTasksInHouseController } from "../controllers/cleningTask.controller";
 
 const cleaningTaskRoutes = Router()
+
+cleaningTaskRoutes.post("/house/:houseId/create", createCleaningTaskController)
 
 cleaningTaskRoutes.get("/house/:houseId/all", getAllCleaningTasksInHouseController)
 
