@@ -9,10 +9,12 @@ import {
   createCleaningTaskService,
   getAllCleaningTasksInHouseService,
   getCleaningTaskInHouseByIdService,
+  updateCleaningTaskByIdService,
 } from "../services/cleaningTask.service";
 import {
   cleaningTaskIdSchema,
   createCleaningTaskSchema,
+  updateCleaningTaskSchema,
 } from "../validation/cleaningTask.validation";
 
 export const createCleaningTaskController = asyncHandler(
@@ -58,7 +60,31 @@ export const getCleaningTaskInHouseByIdController = asyncHandler(
 );
 
 export const updateCleaningTaskByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const body = updateCleaningTaskSchema.parse(req.body);
+
+    const cleaningTaskId = cleaningTaskIdSchema.parse(
+      req.params.cleaningTaskId
+    );
+
+    const houseId = houseIdSchema.parse(req.params.houseId);
+
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.EDIT_CLEANING_TASK]);
+
+    const { updatedCleaningTask } = await updateCleaningTaskByIdService(
+      houseId,
+      cleaningTaskId,
+      body
+    );
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Cleaning Task updated successfully",
+      updatedCleaningTask,
+    });
+  }
 );
 
 // done

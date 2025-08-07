@@ -1,6 +1,11 @@
+import { CleaningTasksType } from "../constants/cleaningTask.constant";
 import CleaningTaskModel from "../models/cleaningTask.model";
 import MemberModel from "../models/member.model";
-import { ForbiddenException, NotFoundException } from "../utils/appError";
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+} from "../utils/appError";
 
 export const createCleaningTaskService = async (
   houseId: string,
@@ -122,5 +127,42 @@ export const getCleaningTaskInHouseByIdService = async (
 
   return {
     cleaningTask,
+  };
+};
+
+export const updateCleaningTaskByIdService = async (
+  houseId: string,
+  cleaningTaskId: string,
+  body: {
+    tasks?: string[];
+    assignedTo?: string[];
+    status?: string;
+    date?: string;
+  }
+) => {
+  // Optional: verify assignedTo users are house members
+  if (body.assignedTo && body.assignedTo.length > 0) {
+    const members = await MemberModel.find({
+      houseId,
+      userId: { $in: body.assignedTo },
+    }).select("userId");
+
+    if (members.length !== body.assignedTo.length) {
+      throw new BadRequestException("Some assigned users are not house members");
+    }
+  }
+
+  const updatedCleaningTask = await CleaningTaskModel.findOneAndUpdate(
+    { _id: cleaningTaskId, houseId },
+    { $set: body },
+    { new: true }
+  );
+
+  if (!updatedCleaningTask) {
+    throw new NotFoundException("Cleaning Task not found");
+  }
+
+  return {
+    updatedCleaningTask,
   };
 };
