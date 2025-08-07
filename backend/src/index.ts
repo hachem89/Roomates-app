@@ -66,6 +66,10 @@ app.use(`${BASE_PATH}/house`, requireJwtAuth,houseRoutes);
 app.use(`${BASE_PATH}/member`, requireJwtAuth,memberRoutes);
 
 // get all house's cleaning tasks
+// get cleaning task by id in a house
+// create a cleaning task
+// update cleaning task by id
+// delete cleaning task by id
 app.use(`${BASE_PATH}/task`, requireJwtAuth,cleaningTaskRoutes);
 
 app.use(errorHandler);

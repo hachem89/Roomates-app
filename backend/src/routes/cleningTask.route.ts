@@ -12,11 +12,13 @@ const cleaningTaskRoutes = Router();
 // done
 cleaningTaskRoutes.post("/house/:houseId/create", createCleaningTaskController);
 
+// done
 cleaningTaskRoutes.put(
   "/:cleaningTaskId/house/:houseId/update",
   updateCleaningTaskByIdController
 );
 
+// done
 cleaningTaskRoutes.delete(
   "/:cleaningTaskId/house/:houseId/delete",
   deleteCleaningTaskByIdController

@@ -7,6 +7,7 @@ import { Permissions } from "../constants/role.constant";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
 import {
   createCleaningTaskService,
+  deleteCleaningTaskByIdService,
   getAllCleaningTasksInHouseService,
   getCleaningTaskInHouseByIdService,
   updateCleaningTaskByIdService,
@@ -126,5 +127,22 @@ export const getAllCleaningTasksInHouseController = asyncHandler(
 );
 
 export const deleteCleaningTaskByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const cleaningTaskId = cleaningTaskIdSchema.parse(
+      req.params.cleaningTaskId
+    );
+
+    const houseId = houseIdSchema.parse(req.params.houseId);
+
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.DELETE_CLEANING_TASK]);
+
+    await deleteCleaningTaskByIdService(houseId, cleaningTaskId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Task deleted successfully",
+    });
+  }
 );

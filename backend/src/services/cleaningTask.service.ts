@@ -148,7 +148,9 @@ export const updateCleaningTaskByIdService = async (
     }).select("userId");
 
     if (members.length !== body.assignedTo.length) {
-      throw new BadRequestException("Some assigned users are not house members");
+      throw new BadRequestException(
+        "Some assigned users are not house members"
+      );
     }
   }
 
@@ -165,4 +167,19 @@ export const updateCleaningTaskByIdService = async (
   return {
     updatedCleaningTask,
   };
+};
+
+export const deleteCleaningTaskByIdService = async (
+  houseId: string,
+  cleaningTaskId: string
+) => {
+  const cleaningTask = await CleaningTaskModel.findOneAndDelete({
+    _id: cleaningTaskId,
+    houseId,
+  });
+
+  if (!cleaningTask) {
+    throw new NotFoundException("Cleaning Task not found");
+  }
+  return;
 };
