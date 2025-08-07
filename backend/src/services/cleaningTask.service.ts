@@ -42,14 +42,67 @@ export const createCleaningTaskService = async (
   };
 };
 
+export const getAllCleaningTasksInHouseService = async (
+  houseId: string,
+  filters: {
+    status?: string[];
+    assignedTo?: string[];
+    keyword?: string;
+    date?: string;
+  },
+  pagination: {
+    pageSize: number;
+    pageNumber: number;
+  }
+) => {
+  const query: Record<string, any> = {
+    houseId: houseId,
+  };
 
-export const getAllCleaningTasksInHouseService = async (houseId: string) => {
-  const cleaningTasks = await CleaningTaskModel.find({ houseId }).populate(
-    "assignedTo",
-    "_id name profilePicture -password"
-  );
+  if (filters.status && filters.status?.length > 0) {
+    query.status = { $in: filters.status };
+  }
+
+  if (filters.assignedTo && filters.assignedTo?.length > 0) {
+    query.assignedTo = { $in: filters.assignedTo };
+  }
+
+  if (filters.keyword && filters.keyword !== undefined) {
+    query.tasks = {
+      $elemMatch: {
+        $regex: filters.keyword,
+        $options: "i",
+      },
+    };
+  }
+
+  if (filters.date) {
+    query.date = { $eq: new Date(filters.date) };
+  }
+
+  // pagination setup
+  const { pageSize, pageNumber } = pagination;
+  const skip = (pageNumber - 1) * pageSize;
+
+  const [cleaningTasks, totalCount] = await Promise.all([
+    CleaningTaskModel.find(query)
+      .skip(skip)
+      .limit(pageSize)
+      .sort({ createdAt: -1 })
+      .populate("assignedTo", "_id name profilePicture -password"),
+    CleaningTaskModel.countDocuments(query),
+  ]);
+
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   return {
     cleaningTasks,
+    pagination: {
+      pageSize,
+      pageNumber,
+      totalCount,
+      totalPages,
+      skip,
+    },
   };
 };

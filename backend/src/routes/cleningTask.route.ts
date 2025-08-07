@@ -1,10 +1,36 @@
 import { Router } from "express";
-import { createCleaningTaskController, getAllCleaningTasksInHouseController } from "../controllers/cleningTask.controller";
+import {
+  createCleaningTaskController,
+  deleteCleaningTaskByIdController,
+  getAllCleaningTasksInHouseController,
+  getCleaningTasksInHouseByIdController,
+  updateCleaningTaskByIdController,
+} from "../controllers/cleningTask.controller";
 
-const cleaningTaskRoutes = Router()
+const cleaningTaskRoutes = Router();
 
-cleaningTaskRoutes.post("/house/:houseId/create", createCleaningTaskController)
+// done
+cleaningTaskRoutes.post("/house/:houseId/create", createCleaningTaskController);
 
-cleaningTaskRoutes.get("/house/:houseId/all", getAllCleaningTasksInHouseController)
+cleaningTaskRoutes.put(
+  "/:cleaningTaskId/house/:houseId/update",
+  updateCleaningTaskByIdController
+);
 
-export default cleaningTaskRoutes
+cleaningTaskRoutes.delete(
+  "/:cleaningTaskId/house/:houseId/delete",
+  deleteCleaningTaskByIdController
+);
+
+cleaningTaskRoutes.get(
+  "/:cleaningTaskId/house/:houseId",
+  getCleaningTasksInHouseByIdController
+);
+
+// needs filtering and pagination
+cleaningTaskRoutes.get(
+  "/house/:houseId/all",
+  getAllCleaningTasksInHouseController
+);
+
+export default cleaningTaskRoutes;
