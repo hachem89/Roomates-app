@@ -33,7 +33,6 @@ export const cleaningTaskIdSchema = z.string().trim().min(1);
 export const createCleaningTaskSchema = z.object({
   tasks: tasksSchema,
   assignedTo: assignedToSchema,
-  status: statusSchema,
   date: dateSchema,
 });
 
