@@ -1,16 +1,20 @@
-import z, { date, string } from "zod";
+import z from "zod";
 import {
   CleaningTasks,
   CleaningTaskStatus,
 } from "../constants/cleaningTask.constant";
 
-export const assignedToSchema = z.string().trim().min(1);
+export const assignedToSchema = z
+  .array(z.string().trim().min(1))
+  .nonempty("At least one member must be assigned");
 
-export const tasksSchema = z.enum(
-  Object.values(CleaningTasks) as [string, ...string[]]
+export const tasksSchema = z
+  .array(z.enum(Object.values(CleaningTasks) as [string, ...string[]]))
+  .nonempty("At least one cleaning task is required");
+
+export const statusSchema = z.enum(
+  Object.values(CleaningTaskStatus) as [string, ...string[]]
 );
-
-export const statusSchema = z.string().trim().min(1)
 
 export const dateSchema = z
   .string()
