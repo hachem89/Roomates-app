@@ -8,8 +8,12 @@ import { HTTPSTATUS } from "../constants/httpStatus.constant";
 import {
   createCleaningTaskService,
   getAllCleaningTasksInHouseService,
+  getCleaningTaskInHouseByIdService,
 } from "../services/cleaningTask.service";
-import { createCleaningTaskSchema } from "../validation/cleaningTask.validation";
+import {
+  cleaningTaskIdSchema,
+  createCleaningTaskSchema,
+} from "../validation/cleaningTask.validation";
 
 export const createCleaningTaskController = asyncHandler(
   async (req: Request, res: Response) => {
@@ -30,15 +34,34 @@ export const createCleaningTaskController = asyncHandler(
   }
 );
 
-export const getCleaningTasksInHouseByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+export const getCleaningTaskInHouseByIdController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const cleaningTaskId = cleaningTaskIdSchema.parse(
+      req.params.cleaningTaskId
+    );
+    const houseId = houseIdSchema.parse(req.params.houseId);
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.VIEW_ONLY]);
+
+    const { cleaningTask } = await getCleaningTaskInHouseByIdService(
+      cleaningTaskId,
+      houseId
+    );
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Cleaning Task fetched successfully",
+      cleaningTask,
+    });
+  }
 );
 
 export const updateCleaningTaskByIdController = asyncHandler(
   async (req: Request, res: Response) => {}
 );
 
-// add filtering and pagination
+// done
 export const getAllCleaningTasksInHouseController = asyncHandler(
   async (req: Request, res: Response) => {
     const houseId = houseIdSchema.parse(req.params.houseId);
@@ -60,10 +83,14 @@ export const getAllCleaningTasksInHouseController = asyncHandler(
 
     const pagination = {
       pageSize: parseInt(req.query.pageSize as string) || 10,
-      pageNumber: parseInt(req.query.pageNumber as string) || 1
-    }
+      pageNumber: parseInt(req.query.pageNumber as string) || 1,
+    };
 
-    const result = await getAllCleaningTasksInHouseService(houseId, filters, pagination);
+    const result = await getAllCleaningTasksInHouseService(
+      houseId,
+      filters,
+      pagination
+    );
 
     return res.status(HTTPSTATUS.OK).json({
       message: "All cleaning tasks fetched successfully",

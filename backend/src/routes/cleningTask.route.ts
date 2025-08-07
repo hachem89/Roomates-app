@@ -3,7 +3,7 @@ import {
   createCleaningTaskController,
   deleteCleaningTaskByIdController,
   getAllCleaningTasksInHouseController,
-  getCleaningTasksInHouseByIdController,
+  getCleaningTaskInHouseByIdController,
   updateCleaningTaskByIdController,
 } from "../controllers/cleningTask.controller";
 
@@ -22,12 +22,13 @@ cleaningTaskRoutes.delete(
   deleteCleaningTaskByIdController
 );
 
+
 cleaningTaskRoutes.get(
   "/:cleaningTaskId/house/:houseId",
-  getCleaningTasksInHouseByIdController
+  getCleaningTaskInHouseByIdController
 );
 
-// needs filtering and pagination
+// done
 cleaningTaskRoutes.get(
   "/house/:houseId/all",
   getAllCleaningTasksInHouseController

@@ -1,6 +1,6 @@
 import CleaningTaskModel from "../models/cleaningTask.model";
 import MemberModel from "../models/member.model";
-import { ForbiddenException } from "../utils/appError";
+import { ForbiddenException, NotFoundException } from "../utils/appError";
 
 export const createCleaningTaskService = async (
   houseId: string,
@@ -104,5 +104,23 @@ export const getAllCleaningTasksInHouseService = async (
       totalPages,
       skip,
     },
+  };
+};
+
+export const getCleaningTaskInHouseByIdService = async (
+  cleaningTaskId: string,
+  houseId: string
+) => {
+  const cleaningTask = await CleaningTaskModel.findOne({
+    _id: cleaningTaskId,
+    houseId,
+  }).populate("assignedTo", "_id name profilePicture -password");
+
+  if (!cleaningTask) {
+    throw new NotFoundException("Cleaning Task not found");
+  }
+
+  return {
+    cleaningTask,
   };
 };
