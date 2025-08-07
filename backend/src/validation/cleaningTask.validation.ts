@@ -10,9 +10,7 @@ export const tasksSchema = z.enum(
   Object.values(CleaningTasks) as [string, ...string[]]
 );
 
-export const statusSchema = z.enum(
-  Object.values(CleaningTaskStatus) as [string, ...string[]]
-);
+export const statusSchema = z.string().trim().min(1)
 
 export const dateSchema = z
   .string()
