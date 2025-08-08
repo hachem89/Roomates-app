@@ -28,7 +28,7 @@ const cleaningTasksSchema = new Schema<CleaningTaskDocument>(
     tasks: {
       type: [String],
       enum: Object.values(CleaningTasks),
-      required: true,
+      required: true
     },
     assignedTo: [
       {
