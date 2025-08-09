@@ -3,7 +3,7 @@ import { generateInviteCode } from "../utils/uuid";
 
 export interface HouseDocument extends Document {
   name: string;
-  description?: string | null;
+  description: string | null;
   owner: mongoose.Types.ObjectId;
   inviteCode: string;
   membersCount: number,

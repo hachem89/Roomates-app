@@ -3,13 +3,12 @@ import { Units, UnitsType } from "../constants/unit.constant";
 
 export interface GroceryItemDocument extends Document {
   name: string;
-  emoji: string | null;
   quantity: number;
   unit: UnitsType;
   pricePerUnit: number;
   groceryListId: mongoose.Types.ObjectId;
   houseId: mongoose.Types.ObjectId;
-  purchasedBy: mongoose.Types.ObjectId | null;
+  purchasedBy?: mongoose.Types.ObjectId | null;
   isPurchased: boolean;
   purchasedDate: Date | null;
   createdAt: Date;
@@ -23,12 +22,6 @@ const groceryItemSchema = new Schema<GroceryItemDocument>(
       required: true,
       trim: true,
       unique: true
-    },
-    emoji: {
-      type: String,
-      required: false,
-      trim: true,
-      default: null,
     },
     quantity: {
       type: Number,
