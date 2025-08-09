@@ -5,6 +5,7 @@ export interface GroceryListDocument extends Document {
   emoji: string;
   houseId: mongoose.Types.ObjectId;
   createdBy: mongoose.Types.ObjectId;
+  totalPrice: number
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +33,11 @@ const groceryListSchema = new Schema<GroceryListDocument>(
       ref: "User",
       required: true,
     },
+    totalPrice:{
+      type: Number,
+      required: false,
+      default:0
+    }
   },
   {
     timestamps: true,
