@@ -78,3 +78,9 @@ export const updateGroceryItemSchema = z.object({
   isPurchased: z.boolean().optional(),
   purchasedDate: dateSchema.optional(),
 });
+
+// exporting types for input validation:
+export type createBillInputType = z.infer<typeof createBillSchema>
+export type updateBillInputType = z.infer<typeof updateBillSchema>
+export type addGroceryItemInputType = z.infer<typeof addGroceryItemSchema>
+export type updateGroceryItemInputType = z.infer<typeof updateGroceryItemSchema>
