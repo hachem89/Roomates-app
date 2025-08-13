@@ -6,6 +6,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from "../utils/appError";
+import { getMemberRoleInHouse } from "./member.service";
 
 export const createCleaningTaskService = async (
   houseId: string,
@@ -16,22 +17,10 @@ export const createCleaningTaskService = async (
   }
 ) => {
   const { tasks, assignedTo, date } = body;
-
-  const memberChecks = await MemberModel.find({
-    houseId,
-    userId: { $in: assignedTo },
-  }).select("userId");
-
-  const validUserIds = memberChecks.map((m) => m.userId.toString());
-
-  // Check if any assignedTo users are not part of the house
-  const invalidUsers = assignedTo.filter((id) => !validUserIds.includes(id));
-
-  if (invalidUsers.length > 0) {
-    throw new ForbiddenException(
-      "Some assigned users are not members of this house"
-    );
-  }
+  
+  await Promise.all(
+  assignedTo.map((userId) => getMemberRoleInHouse(userId, houseId))
+  );
 
   const cleaningTask = new CleaningTaskModel({
     tasks,
@@ -141,17 +130,11 @@ export const updateCleaningTaskByIdService = async (
   }
 ) => {
   // Optional: verify assignedTo users are house members
-  if (body.assignedTo && body.assignedTo.length > 0) {
-    const members = await MemberModel.find({
-      houseId,
-      userId: { $in: body.assignedTo },
-    }).select("userId");
-
-    if (members.length !== body.assignedTo.length) {
-      throw new BadRequestException(
-        "Some assigned users are not house members"
-      );
-    }
+  const {assignedTo} = body
+  if(assignedTo){
+    await Promise.all(
+      assignedTo.map(userId=> getMemberRoleInHouse(userId,houseId))
+    )
   }
 
   const updatedCleaningTask = await CleaningTaskModel.findOneAndUpdate(
