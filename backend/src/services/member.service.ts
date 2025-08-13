@@ -23,7 +23,7 @@ export const getMemberRoleInHouse = async (userId: string, houseId: string) => {
 
   if (!member) {
     throw new UnauthorizedException(
-      "You are not a member of this house",
+      `userId=${userId} is not a member of this house`,
       ErrorCodeEnum.ACCESS_UNAUTHORIZED
     );
   }
