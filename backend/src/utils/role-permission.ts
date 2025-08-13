@@ -19,6 +19,10 @@ export const RolePermissions: Record<RoleType, Array<PermissionType>> = {
     Permissions.EDIT_CLEANING_TASK,
     Permissions.DELETE_CLEANING_TASK,
 
+    Permissions.CREATE_GROCERY_LIST,
+    Permissions.EDIT_GROCERY_LIST,
+    Permissions.DELETE_GROCERY_LIST,
+
     Permissions.VIEW_ONLY,
   ],
   ADMIN: [
@@ -26,6 +30,10 @@ export const RolePermissions: Record<RoleType, Array<PermissionType>> = {
     Permissions.MANAGE_HOUSE_SETTINGS,
 
     Permissions.CREATE_CLEANING_TASK,
+
+    Permissions.CREATE_GROCERY_LIST,
+    Permissions.EDIT_GROCERY_LIST,
+    Permissions.DELETE_GROCERY_LIST,
 
     Permissions.VIEW_ONLY,
   ],
