@@ -8,6 +8,7 @@ import { Permissions } from "../constants/role.constant";
 import { HTTPSTATUS } from "../constants/httpStatus.constant";
 import {
   createGroceryListService,
+  deleteGroceryListByIdService,
   getAllGroceryListsService,
   getGroceryListByIdService,
 } from "../services/grocery.service";
@@ -80,7 +81,21 @@ export const updateGroceryListByIdController = asyncHandler(
 );
 
 export const deleteGroceryListByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    // delete the grocery list and its groceries
+    const houseId = houseIdSchema.parse(req.params.houseId);
+    const groceryListId = billIdSchema.parse(req.params.groceryListId);
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.DELETE_GROCERY_LIST]);
+
+    await deleteGroceryListByIdService(groceryListId,houseId)
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Grocery List deleted successfully",
+    });
+  }
 );
 
 // do i need it seperatly or i just return them when fetching a grocery list

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { BillCategory } from "../constants/bill-category.constant";
 import BillModel from "../models/bill.model";
 import GroceryItemModel from "../models/groceryItem.model";
@@ -32,7 +33,7 @@ export const getAllGroceryListsService = async (houseId: string) => {
   const groceryLists = await BillModel.find({
     category: BillCategory.GROCERY_LIST,
     houseId,
-  }).populate("createdBy","name -password");
+  }).populate("createdBy", "name -password");
 
   if (!groceryLists) {
     throw new NotFoundException("Grocery lists not found check houseId");
@@ -64,4 +65,35 @@ export const createGroceryListService = async (
   return {
     groceryList,
   };
+};
+
+export const deleteGroceryListByIdService = async (
+  groceryListId: string,
+  houseId: string
+) => {
+  const session = await mongoose.startSession();
+  
+  try {
+    session.startTransaction();
+    const groceryList = await BillModel.findOne({
+      _id: groceryListId,
+      houseId,
+      category: BillCategory.GROCERY_LIST,
+    }).session(session);
+
+    if (!groceryList) {
+      throw new NotFoundException("Grocery list not found");
+    }
+
+    await GroceryItemModel.deleteMany({ groceryListId }).session(session);
+
+    await groceryList.deleteOne({ session });
+
+    await session.commitTransaction();
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  }finally{
+    session.endSession();
+  }
 };

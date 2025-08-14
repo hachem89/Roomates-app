@@ -38,6 +38,7 @@ groceryRoutes.patch(
   updateGroceryListByIdController
 );
 
+// done
 // delete grocery list by id
 groceryRoutes.delete(
   "/:groceryListId/house/:houseId/delete",
