@@ -1,5 +1,5 @@
 export const BillCategory = {
-  GROCERIES: "Groceries",
+  GROCERY_LIST: "Grocery list",
   RENT: "Rent",
   INTERNET: "Internet",
   ELECTRICITY: "Electicity",

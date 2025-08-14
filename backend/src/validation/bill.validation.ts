@@ -23,7 +23,7 @@ const totalPriceSchema = z
 const participantsSchema = z
   .array(
     z.object({
-      userId: z.string().trim().min(1, { message: "User id is required" }),
+      participant: z.string().trim().min(1, { message: "participant id is required" }),
       amount: z.number().min(0, { message: "Should be >= 0" }).optional(),
     })
   )
@@ -45,7 +45,7 @@ export const groceryItemIdSchema = z.string().trim().min(1);
 export const createBillSchema = z.object({
   title: titleSchema,
   category: categorySchema,
-  totalPrice: totalPriceSchema,
+  totalPrice: totalPriceSchema.optional(),
   participants: participantsSchema,
   dueDate: dateSchema.optional(),
 });

@@ -1,7 +1,6 @@
 import z from "zod";
 import {
   CleaningTasks,
-  CleaningTasksType,
   CleaningTaskStatus,
 } from "../constants/cleaningTask.constant";
 

@@ -15,6 +15,7 @@ import requireJwtAuth from "./middlewares/requireJwtAuth.middleware";
 import houseRoutes from "./routes/house.route";
 import memberRoutes from "./routes/member.route";
 import cleaningTaskRoutes from "./routes/cleningTask.route";
+import groceryRoutes from "./routes/grocery.route";
 
 const app = express();
 
@@ -71,6 +72,8 @@ app.use(`${BASE_PATH}/member`, requireJwtAuth,memberRoutes);
 // update cleaning task by id
 // delete cleaning task by id
 app.use(`${BASE_PATH}/task`, requireJwtAuth,cleaningTaskRoutes);
+
+app.use(`${BASE_PATH}/grocery`, requireJwtAuth,groceryRoutes);
 
 app.use(errorHandler);
 
