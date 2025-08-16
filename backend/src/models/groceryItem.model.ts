@@ -21,7 +21,6 @@ const groceryItemSchema = new Schema<GroceryItemDocument>(
       type: String,
       required: true,
       trim: true,
-      unique: true
     },
     quantity: {
       type: Number,
