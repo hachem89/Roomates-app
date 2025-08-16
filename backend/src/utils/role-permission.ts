@@ -23,6 +23,10 @@ export const RolePermissions: Record<RoleType, Array<PermissionType>> = {
     Permissions.EDIT_GROCERY_LIST,
     Permissions.DELETE_GROCERY_LIST,
 
+    Permissions.ADD_GROCERY_ITEM,
+    Permissions.EDIT_GROCERY_ITEM,
+    Permissions.DELETE_GROCERY_ITEM,
+
     Permissions.VIEW_ONLY,
   ],
   ADMIN: [
@@ -34,6 +38,10 @@ export const RolePermissions: Record<RoleType, Array<PermissionType>> = {
     Permissions.CREATE_GROCERY_LIST,
     Permissions.EDIT_GROCERY_LIST,
     Permissions.DELETE_GROCERY_LIST,
+
+    Permissions.ADD_GROCERY_ITEM,
+    Permissions.EDIT_GROCERY_ITEM,
+    Permissions.DELETE_GROCERY_ITEM,
 
     Permissions.VIEW_ONLY,
   ],
