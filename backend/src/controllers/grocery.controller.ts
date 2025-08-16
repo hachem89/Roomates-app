@@ -16,10 +16,14 @@ import {
   deleteGroceryListByIdService,
   getAllGroceriesOfGroceryListService,
   getAllGroceryListsService,
+  getGroceryItemByIdService,
   getGroceryListByIdService,
   updateGroceryListByIdService,
 } from "../services/grocery.service";
-import { addGroceryItemSchema, groceryItemIdSchema } from "../validation/groceryItem.validation";
+import {
+  addGroceryItemSchema,
+  groceryItemIdSchema,
+} from "../validation/groceryItem.validation";
 
 // done: return grocery list details with its groceries
 export const getGroceryListByIdController = asyncHandler(
@@ -155,9 +159,10 @@ export const getAllGroceriesOfGroceryListController = asyncHandler(
   }
 );
 
+// done
 export const getGroceryItemByIdController = asyncHandler(
   async (req: Request, res: Response) => {
-    const groceryItemId = groceryItemIdSchema.parse(req.params.groceryItemId)
+    const groceryItemId = groceryItemIdSchema.parse(req.params.groceryItemId);
     const houseId = houseIdSchema.parse(req.params.houseId);
     const groceryListId = billIdSchema.parse(req.params.groceryListId);
     const userId = req.user?._id;
@@ -166,12 +171,13 @@ export const getGroceryItemByIdController = asyncHandler(
     roleGuard(role, [Permissions.VIEW_ONLY]);
 
     const { grocery } = await getGroceryItemByIdService(
+      groceryItemId,
       groceryListId,
       houseId
     );
 
     return res.status(HTTPSTATUS.OK).json({
-      message: "Groceries fetched successfully",
+      message: "Grocery item fetched successfully",
       grocery,
     });
   }
@@ -189,7 +195,7 @@ export const addGroceryItemToGroceryListController = asyncHandler(
     const houseId = houseIdSchema.parse(req.params.houseId);
 
     const groceryListId = billIdSchema.parse(req.params.groceryListId);
-    
+
     const userId = req.user?._id;
 
     const { role } = await getMemberRoleInHouse(userId, houseId);

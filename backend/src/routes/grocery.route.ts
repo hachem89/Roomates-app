@@ -56,7 +56,7 @@ groceryRoutes.get(
   getAllGroceriesOfGroceryListController
 );
 
-// get grocery item by id
+//done: get grocery item by id
 groceryRoutes.get(
   "/:groceryListId/house/:houseId/groceries/:groceryItemId",
   getGroceryItemByIdController

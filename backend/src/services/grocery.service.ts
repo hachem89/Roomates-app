@@ -144,7 +144,6 @@ export const updateGroceryListByIdService = async (
   };
 };
 
-
 export const getAllGroceriesOfGroceryListService = async (
   groceryListId: string,
   houseId: string
@@ -152,7 +151,7 @@ export const getAllGroceriesOfGroceryListService = async (
   const groceries = await GroceryItemModel.find({
     groceryListId,
     houseId,
-  })
+  });
 
   if (!groceries) {
     throw new NotFoundException(
@@ -204,12 +203,35 @@ export const addGroceryItemToGroceryListService = async (
   // update the totalPrice and amout per participant
   groceryList.totalPrice += newItem.quantity * newItem.pricePerUnit;
 
-  groceryList.participants.forEach(p=>{
-    p.amount = groceryList.totalPrice / groceryList.participants.length
-  })
-  await groceryList.save()
+  groceryList.participants.forEach((p) => {
+    p.amount = groceryList.totalPrice / groceryList.participants.length;
+  });
+  await groceryList.save();
 
   return {
     grocery: newItem,
+  };
+};
+
+// done
+export const getGroceryItemByIdService = async (
+  groceryItemId: string,
+  groceryListId: string,
+  houseId: string
+) => {
+  const groceryItem = await GroceryItemModel.findOne({
+    _id: groceryItemId,
+    groceryListId,
+    houseId,
+  });
+
+  if (!groceryItem) {
+    throw new NotFoundException(
+      "Grocery item not found or wrong grocery list/house"
+    );
+  }
+
+  return {
+    grocery: groceryItem,
   };
 };
