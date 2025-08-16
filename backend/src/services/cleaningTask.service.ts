@@ -1,9 +1,5 @@
-import { CleaningTasksType } from "../constants/cleaningTask.constant";
 import CleaningTaskModel from "../models/cleaningTask.model";
-import MemberModel from "../models/member.model";
 import {
-  BadRequestException,
-  ForbiddenException,
   NotFoundException,
 } from "../utils/appError";
 import { getMemberRoleInHouse } from "./member.service";

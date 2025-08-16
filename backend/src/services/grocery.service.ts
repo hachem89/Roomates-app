@@ -3,7 +3,10 @@ import { BillCategory } from "../constants/bill-category.constant";
 import BillModel from "../models/bill.model";
 import GroceryItemModel from "../models/groceryItem.model";
 import { NotFoundException } from "../utils/appError";
-import { createBillInputType } from "../validation/bill.validation";
+import {
+  createBillInputType,
+  updateBillInputType,
+} from "../validation/bill.validation";
 import { getMemberRoleInHouse } from "./member.service";
 
 export const getGroceryListByIdService = async (
@@ -72,7 +75,7 @@ export const deleteGroceryListByIdService = async (
   houseId: string
 ) => {
   const session = await mongoose.startSession();
-  
+
   try {
     session.startTransaction();
     const groceryList = await BillModel.findOne({
@@ -93,7 +96,41 @@ export const deleteGroceryListByIdService = async (
   } catch (error) {
     await session.abortTransaction();
     throw error;
-  }finally{
+  } finally {
     session.endSession();
   }
+};
+
+export const updateGroceryListByIdService = async (
+  houseId: string,
+  groceryListId: string,
+  body: updateBillInputType
+) => {
+  // verify participants are house members
+  const { participants } = body;
+  if (participants) {
+    await Promise.all(
+      participants.map((p) => getMemberRoleInHouse(p.participant, houseId))
+    );
+  }
+
+  const updatedGroceryList = await BillModel.findOneAndUpdate(
+    { _id: groceryListId, houseId },
+    { $set: body },
+    { new: true }
+  );
+
+  if (!updatedGroceryList) {
+    throw new NotFoundException("Grocery list not found");
+  }
+
+  const groceries = await GroceryItemModel.find({
+    groceryListId,
+    houseId,
+  });
+
+  return {
+    updatedGroceryList,
+    groceries,
+  };
 };

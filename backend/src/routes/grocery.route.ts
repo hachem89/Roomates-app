@@ -5,6 +5,7 @@ import {
   deleteGroceryItemByIdController,
   deleteGroceryListByIdController,
   getAllGroceriesOfGroceryListController,
+  getAllGroceriesOfHouseController,
   getAllGroceryListsController,
   getGroceryItemByIdController,
   getGroceryListByIdController,
@@ -15,23 +16,21 @@ import {
 const groceryRoutes = Router();
 
 // done
-// get a grocery list in a house by groceryListId
+// get a grocery list in a house by groceryListId with its groceries
 groceryRoutes.get(
   "/:groceryListId/house/:houseId",
   getGroceryListByIdController
 );
 
 // done
-// get all grocery lists of a house 
-groceryRoutes.get(
-  "/house/:houseId/all",
-  getAllGroceryListsController
-);
+// get all grocery lists of a house without groceries 
+groceryRoutes.get("/house/:houseId/all", getAllGroceryListsController);
 
 // done
-// create grocery list
+// create grocery list 
 groceryRoutes.post("/house/:houseId/create", createGroceryListController);
 
+// done
 // update grocery list details
 groceryRoutes.patch(
   "/:groceryListId/house/:houseId/update",
@@ -59,6 +58,12 @@ groceryRoutes.get(
   getGroceryItemByIdController
 );
 
+// get all groceries in a house and group them by name and filter by date (from --/--/-- to --/--/--)
+groceryRoutes.get(
+  "/house/:houseId/groceries/all",
+  getAllGroceriesOfHouseController
+);
+
 // add groceries to a grocery list
 groceryRoutes.post(
   "/:groceryListId/house/:houseId/groceries/add",
@@ -77,4 +82,4 @@ groceryRoutes.delete(
   deleteGroceryItemByIdController
 );
 
-export default groceryRoutes
+export default groceryRoutes;

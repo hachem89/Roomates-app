@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 import { houseIdSchema } from "../validation/house.validation";
-import { billIdSchema, createBillSchema } from "../validation/bill.validation";
+import {
+  billIdSchema,
+  createBillSchema,
+  updateBillSchema,
+} from "../validation/bill.validation";
 import { getMemberRoleInHouse } from "../services/member.service";
 import { roleGuard } from "../utils/roleGuard";
 import { Permissions } from "../constants/role.constant";
@@ -11,8 +15,10 @@ import {
   deleteGroceryListByIdService,
   getAllGroceryListsService,
   getGroceryListByIdService,
+  updateGroceryListByIdService,
 } from "../services/grocery.service";
 
+// done: return grocery list details with its groceries
 export const getGroceryListByIdController = asyncHandler(
   async (req: Request, res: Response) => {
     const houseId = houseIdSchema.parse(req.params.houseId);
@@ -35,6 +41,7 @@ export const getGroceryListByIdController = asyncHandler(
   }
 );
 
+// done: return all grocery lists of a house without groceries
 export const getAllGroceryListsController = asyncHandler(
   async (req: Request, res: Response) => {
     const houseId = houseIdSchema.parse(req.params.houseId);
@@ -53,6 +60,7 @@ export const getAllGroceryListsController = asyncHandler(
   }
 );
 
+// done: create new grocery list
 export const createGroceryListController = asyncHandler(
   async (req: Request, res: Response) => {
     const body = createBillSchema.parse(req.body);
@@ -76,10 +84,34 @@ export const createGroceryListController = asyncHandler(
   }
 );
 
+// update grocery list
 export const updateGroceryListByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const body = updateBillSchema.parse(req.body);
+
+    const userId = req.user?._id;
+
+    const houseId = houseIdSchema.parse(req.params.houseId);
+    const groceryListId = billIdSchema.parse(req.params.groceryListId);
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.EDIT_GROCERY_LIST]);
+
+    const { updatedGroceryList, groceries } = await updateGroceryListByIdService(
+      houseId,
+      groceryListId,
+      body
+    );
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Grocery list updated successfully",
+      updatedGroceryList,
+      groceries
+    })
+  }
 );
 
+// done
 export const deleteGroceryListByIdController = asyncHandler(
   async (req: Request, res: Response) => {
     // delete the grocery list and its groceries
@@ -90,7 +122,7 @@ export const deleteGroceryListByIdController = asyncHandler(
     const { role } = await getMemberRoleInHouse(userId, houseId);
     roleGuard(role, [Permissions.DELETE_GROCERY_LIST]);
 
-    await deleteGroceryListByIdService(groceryListId,houseId)
+    await deleteGroceryListByIdService(groceryListId, houseId);
 
     return res.status(HTTPSTATUS.OK).json({
       message: "Grocery List deleted successfully",
@@ -105,6 +137,10 @@ export const getAllGroceriesOfGroceryListController = asyncHandler(
 );
 
 export const getGroceryItemByIdController = asyncHandler(
+  async (req: Request, res: Response) => {}
+);
+
+export const getAllGroceriesOfHouseController = asyncHandler(
   async (req: Request, res: Response) => {}
 );
 
