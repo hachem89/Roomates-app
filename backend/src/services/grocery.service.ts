@@ -144,6 +144,7 @@ export const updateGroceryListByIdService = async (
   };
 };
 
+// done (missing pagination + filtering + searching)
 export const getAllGroceriesOfGroceryListService = async (
   groceryListId: string,
   houseId: string
@@ -233,5 +234,53 @@ export const getGroceryItemByIdService = async (
 
   return {
     grocery: groceryItem,
+  };
+};
+
+// done: sort by just totalQuantity (modify it so it can be sorted by totalQuantit or totalPrice) and filter by purchasedDate 
+export const getAllGroceriesOfHouseService = async (
+  houseId: string,
+  filters: {
+    startDate?: string;
+    endDate?: string;
+  }
+) => {
+  const match: Record<string, any> = {
+    houseId: new mongoose.Types.ObjectId(houseId),
+  };
+
+  if (filters.startDate && filters.endDate) {
+    match.purchasedDate = {
+      $gte: new Date(filters.startDate),
+      $lte: new Date(filters.endDate),
+    };
+  }
+
+  const groupedGroceries = await GroceryItemModel.aggregate([
+    {
+      $match: match,
+    },
+    {
+      $group: {
+        _id: "$name",
+        totalQuantity: { $sum: "$quantity" },
+        totalSpent: { $sum: { $multiply: ["$pricePerUnit", "$quantity"] } },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        item: "$_id",
+        totalQuantity: 1,
+        totalSpent: 1,
+      },
+    },
+    {
+      $sort: { totalQuantity: -1 },
+    },
+  ]);
+
+  return {
+    groceries: groupedGroceries,
   };
 };
