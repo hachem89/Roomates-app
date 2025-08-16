@@ -15,6 +15,8 @@ import {
 
 const groceryRoutes = Router();
 
+// ------------------Grocery List ---------------
+
 // done
 // get a grocery list in a house by groceryListId with its groceries
 groceryRoutes.get(
@@ -44,9 +46,11 @@ groceryRoutes.delete(
   deleteGroceryListByIdController
 );
 
-// GROCERIES
+// ---------------------GROCERIES-----------------:
 
 // get all groceries of a grocery list
+// i can add pagination and filtering here and searching 
+// done
 groceryRoutes.get(
   "/:groceryListId/house/:houseId/groceries/all",
   getAllGroceriesOfGroceryListController
@@ -64,7 +68,7 @@ groceryRoutes.get(
   getAllGroceriesOfHouseController
 );
 
-// add groceries to a grocery list
+//done: add groceries to a grocery list
 groceryRoutes.post(
   "/:groceryListId/house/:houseId/groceries/add",
   addGroceryItemToGroceryListController

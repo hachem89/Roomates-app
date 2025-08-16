@@ -2,13 +2,15 @@ import mongoose from "mongoose";
 import { BillCategory } from "../constants/bill-category.constant";
 import BillModel from "../models/bill.model";
 import GroceryItemModel from "../models/groceryItem.model";
-import { NotFoundException } from "../utils/appError";
+import { BadRequestException, NotFoundException } from "../utils/appError";
 import {
   createBillInputType,
   updateBillInputType,
 } from "../validation/bill.validation";
 import { getMemberRoleInHouse } from "./member.service";
+import { addGroceryItemInputType } from "../validation/groceryItem.validation";
 
+// done
 export const getGroceryListByIdService = async (
   groceryListId: string,
   houseId: string
@@ -26,12 +28,16 @@ export const getGroceryListByIdService = async (
     houseId,
   }).populate("purchasedBy", "name -password");
 
+  const numberOfGroceries = groceries.length;
+
   return {
     groceryList,
+    numberOfGroceries,
     groceries,
   };
 };
 
+// done
 export const getAllGroceryListsService = async (houseId: string) => {
   const groceryLists = await BillModel.find({
     category: BillCategory.GROCERY_LIST,
@@ -47,6 +53,7 @@ export const getAllGroceryListsService = async (houseId: string) => {
   };
 };
 
+// done
 export const createGroceryListService = async (
   userId: string,
   houseId: string,
@@ -70,6 +77,7 @@ export const createGroceryListService = async (
   };
 };
 
+// done
 export const deleteGroceryListByIdService = async (
   groceryListId: string,
   houseId: string
@@ -101,6 +109,7 @@ export const deleteGroceryListByIdService = async (
   }
 };
 
+// done
 export const updateGroceryListByIdService = async (
   houseId: string,
   groceryListId: string,
@@ -132,5 +141,75 @@ export const updateGroceryListByIdService = async (
   return {
     updatedGroceryList,
     groceries,
+  };
+};
+
+
+export const getAllGroceriesOfGroceryListService = async (
+  groceryListId: string,
+  houseId: string
+) => {
+  const groceries = await GroceryItemModel.find({
+    groceryListId,
+    houseId,
+  })
+
+  if (!groceries) {
+    throw new NotFoundException(
+      "Groceries not found or wrong grocery list/house"
+    );
+  }
+
+  return {
+    groceries,
+  };
+};
+
+// done
+export const addGroceryItemToGroceryListService = async (
+  groceryListId: string,
+  houseId: string,
+  body: addGroceryItemInputType
+) => {
+  const { name } = body;
+
+  const groceryList = await BillModel.findOne({
+    _id: groceryListId,
+    category: BillCategory.GROCERY_LIST,
+    houseId,
+  });
+  if (!groceryList) {
+    throw new NotFoundException("Grocery list not found or wrong house");
+  }
+
+  const existingItemInList = await GroceryItemModel.findOne({
+    name,
+    groceryListId,
+    houseId,
+  });
+
+  if (existingItemInList) {
+    throw new BadRequestException(
+      "Item is already in list just increase its quantity"
+    );
+  }
+
+  const newItem = new GroceryItemModel({
+    ...body,
+    groceryListId,
+    houseId,
+  });
+  await newItem.save();
+
+  // update the totalPrice and amout per participant
+  groceryList.totalPrice += newItem.quantity * newItem.pricePerUnit;
+
+  groceryList.participants.forEach(p=>{
+    p.amount = groceryList.totalPrice / groceryList.participants.length
+  })
+  await groceryList.save()
+
+  return {
+    grocery: newItem,
   };
 };

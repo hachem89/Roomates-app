@@ -26,12 +26,13 @@ const groceryItemSchema = new Schema<GroceryItemDocument>(
     quantity: {
       type: Number,
       required: true,
+      default: 1
     },
     unit: {
       type: String,
       enum: Object.values(Units),
       required: true,
-      default: Units.GRAM,
+      default: Units.PIECE,
     },
     pricePerUnit: {
       type: Number,
