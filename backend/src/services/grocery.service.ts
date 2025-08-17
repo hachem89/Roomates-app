@@ -243,6 +243,8 @@ export const getAllGroceriesOfHouseService = async (
   filters: {
     startDate?: string;
     endDate?: string;
+    sortBy?: string;
+    sortOrder?: string;
   }
 ) => {
   const match: Record<string, any> = {
@@ -255,6 +257,18 @@ export const getAllGroceriesOfHouseService = async (
       $lte: new Date(filters.endDate),
     };
   }
+
+  // sortBy can be "name", "totalQuantity", "totalSpent"
+  // sortOrder is "1" (asc) or "-1" (desc)
+
+  const { sortBy = "name", sortOrder = "asc" } = filters;
+
+  const sortFieldMap: Record<string, string> = {
+    name: "name",
+    totalQuantity: "totalQuantity",
+    totalSpent: "totalSpent",
+  };
+  const sortField = sortFieldMap[sortBy] || "name";
 
   const groupedGroceries = await GroceryItemModel.aggregate([
     {
@@ -280,7 +294,7 @@ export const getAllGroceriesOfHouseService = async (
       },
     },
     {
-      $sort: { totalQuantity: -1 },
+      $sort: { [sortField]: sortOrder === "desc" ? -1 : 1 },
     },
   ]);
 

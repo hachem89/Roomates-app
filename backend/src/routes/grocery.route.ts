@@ -25,11 +25,11 @@ groceryRoutes.get(
 );
 
 // done
-// get all grocery lists of a house without groceries 
+// get all grocery lists of a house without groceries
 groceryRoutes.get("/house/:houseId/all", getAllGroceryListsController);
 
 // done
-// create grocery list 
+// create grocery list
 groceryRoutes.post("/house/:houseId/create", createGroceryListController);
 
 // done
@@ -49,7 +49,7 @@ groceryRoutes.delete(
 // ---------------------GROCERIES-----------------:
 
 // get all groceries of a grocery list
-// i can add pagination and filtering here and searching 
+// i can add pagination and filtering here and searching
 // done
 groceryRoutes.get(
   "/:groceryListId/house/:houseId/groceries/all",
@@ -62,7 +62,11 @@ groceryRoutes.get(
   getGroceryItemByIdController
 );
 
-//done: get all groceries in a house and group them by name (sorted by totalQuantity) and filter by date (from --/--/-- to --/--/--)
+// done:
+// sortBy: name / totalQuantity / totalSpent
+// sortOrder: asc / desc
+// filter by purchasedDate
+// /house/:houseId/groceries/all?sortBy="name"&sortOrder="asc"&startDate="2025-08-01"&endDate="2025-08-31"
 groceryRoutes.get(
   "/house/:houseId/groceries/all",
   getAllGroceriesOfHouseController

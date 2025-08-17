@@ -184,7 +184,10 @@ export const getGroceryItemByIdController = asyncHandler(
   }
 );
 
-// done: sort by just totalQuantity (modify it so it can be sorted by totalQuantit or totalPrice) + filter by purchasedDate
+// done:
+// sortBy: name / totalQuantity / totalSpent
+// sortOrder: asc / desc
+// filter by purchasedDate
 export const getAllGroceriesOfHouseController = asyncHandler(
   async (req: Request, res: Response) => {
     const houseId = houseIdSchema.parse(req.params.houseId);
@@ -195,17 +198,18 @@ export const getAllGroceriesOfHouseController = asyncHandler(
     roleGuard(role, [Permissions.VIEW_ONLY]);
 
     const filters = {
-      startDate: req.query.startDate as string | undefined, 
-      endDate: req.query.endDate as string | undefined, 
-    }
+      startDate: req.query.startDate as string | undefined,
+      endDate: req.query.endDate as string | undefined,
+      sortBy: req.query.sortBy as string | undefined,
+      sortOrder: req.query.sortOrder as string | undefined,
+    };
 
-    const {groceries} = await getAllGroceriesOfHouseService(houseId, filters)
+    const { groceries } = await getAllGroceriesOfHouseService(houseId, filters);
 
     return res.status(HTTPSTATUS.OK).json({
       message: "All Groceries of the house fetched successfully",
       groceries,
     });
-
   }
 );
 
