@@ -251,11 +251,12 @@ export const getAllGroceriesOfHouseService = async (
     houseId: new mongoose.Types.ObjectId(houseId),
   };
 
-  if (filters.startDate && filters.endDate) {
-    match.purchasedDate = {
-      $gte: new Date(filters.startDate),
-      $lte: new Date(filters.endDate),
-    };
+  if (filters.startDate) {
+    match.purchasedDate.$gte = new Date(filters.startDate);
+  }
+
+  if (filters.endDate) {
+    match.purchasedDate.$lte = new Date(filters.endDate);
   }
 
   // sortBy can be "name", "totalQuantity", "totalSpent"
