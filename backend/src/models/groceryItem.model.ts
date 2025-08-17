@@ -4,6 +4,7 @@ import { Units, UnitsType } from "../constants/unit.constant";
 export interface GroceryItemDocument extends Document {
   name: string;
   quantity: number;
+  packageSize: number;
   unit: UnitsType;
   pricePerUnit: number;
   groceryListId: mongoose.Types.ObjectId;
@@ -27,6 +28,12 @@ const groceryItemSchema = new Schema<GroceryItemDocument>(
       required: true,
       default: 1
     },
+    packageSize:{
+      type: Number,
+      required: true,
+      default: 0
+    }
+    ,
     unit: {
       type: String,
       enum: Object.values(Units),

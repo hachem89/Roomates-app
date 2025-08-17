@@ -62,7 +62,7 @@ groceryRoutes.get(
   getGroceryItemByIdController
 );
 
-// get all groceries in a house and group them by name (sorted by totalQuantity) and filter by date (from --/--/-- to --/--/--)
+//done: get all groceries in a house and group them by name (sorted by totalQuantity) and filter by date (from --/--/-- to --/--/--)
 groceryRoutes.get(
   "/house/:houseId/groceries/all",
   getAllGroceriesOfHouseController

@@ -237,7 +237,7 @@ export const getGroceryItemByIdService = async (
   };
 };
 
-// done: sort by just totalQuantity (modify it so it can be sorted by totalQuantit or totalPrice) and filter by purchasedDate 
+// done: sort by just totalQuantity (modify it so it can be sorted by totalQuantit or totalPrice) and filter by purchasedDate
 export const getAllGroceriesOfHouseService = async (
   houseId: string,
   filters: {
@@ -262,7 +262,10 @@ export const getAllGroceriesOfHouseService = async (
     },
     {
       $group: {
-        _id: "$name",
+        _id: {
+          name: "$name",
+          packageSize: "$packageSize",
+        },
         totalQuantity: { $sum: "$quantity" },
         totalSpent: { $sum: { $multiply: ["$pricePerUnit", "$quantity"] } },
       },
@@ -270,7 +273,8 @@ export const getAllGroceriesOfHouseService = async (
     {
       $project: {
         _id: 0,
-        item: "$_id",
+        name: "$_id.name",
+        packageSize: "$_id.packageSize",
         totalQuantity: 1,
         totalSpent: 1,
       },

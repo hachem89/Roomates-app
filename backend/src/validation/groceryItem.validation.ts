@@ -6,6 +6,8 @@ const nameSchema = z.string().trim().min(1).max(255);
 
 const quantitySchema = z.number().min(0);
 
+const packageSizeSchema = z.number().min(0);
+
 const unitSchema = z.enum(Object.values(Units) as [string, ...string[]]);
 
 const pricePerUnitSchema = z.number().min(0);
@@ -18,6 +20,7 @@ export const groceryItemIdSchema = z.string().trim().min(1);
 export const addGroceryItemSchema = z.object({
   name: nameSchema,
   quantity: quantitySchema.optional(),
+  packageSize: packageSizeSchema.optional(),
   unit: unitSchema.optional(),
   pricePerUnit: pricePerUnitSchema.optional(),
 });
@@ -26,6 +29,7 @@ export const addGroceryItemSchema = z.object({
 export const updateGroceryItemSchema = z.object({
   name: nameSchema.optional(),
   quantity: quantitySchema.optional(),
+  packageSize: packageSizeSchema.optional(),
   unit: unitSchema.optional(),
   pricePerUnit: pricePerUnitSchema.optional(),
   purchasedBy: purchasedBySchema.optional(),
