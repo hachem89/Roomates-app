@@ -8,7 +8,10 @@ import {
   updateBillInputType,
 } from "../validation/bill.validation";
 import { getMemberRoleInHouse } from "./member.service";
-import { addGroceryItemInputType } from "../validation/groceryItem.validation";
+import {
+  addGroceryItemInputType,
+  updateGroceryItemInputType,
+} from "../validation/groceryItem.validation";
 
 // done
 export const getGroceryListByIdService = async (
@@ -205,7 +208,9 @@ export const addGroceryItemToGroceryListService = async (
   groceryList.totalPrice += newItem.quantity * newItem.pricePerUnit;
 
   groceryList.participants.forEach((p) => {
-    p.amount = groceryList.totalPrice / groceryList.participants.length;
+    p.amount +=
+      (newItem.quantity * newItem.pricePerUnit) /
+      groceryList.participants.length;
   });
   await groceryList.save();
 
@@ -250,6 +255,10 @@ export const getAllGroceriesOfHouseService = async (
   const match: Record<string, any> = {
     houseId: new mongoose.Types.ObjectId(houseId),
   };
+
+  if (filters.startDate || filters.endDate) {
+    match.purchasedDate = {};
+  }
 
   if (filters.startDate) {
     match.purchasedDate.$gte = new Date(filters.startDate);
@@ -301,5 +310,93 @@ export const getAllGroceriesOfHouseService = async (
 
   return {
     groceries: groupedGroceries,
+  };
+};
+
+export const updateGroceryItemByIdService = async (
+  groceryItemId: string,
+  groceryListId: string,
+  houseId: string,
+  body: updateGroceryItemInputType
+) => {
+  const groceryList = await BillModel.findOne({
+    _id: groceryListId,
+    category: BillCategory.GROCERY_LIST,
+    houseId,
+  });
+
+  if (!groceryList) {
+    throw new NotFoundException("Grocery list not found");
+  }
+
+  const oldGroceryItem = await GroceryItemModel.findOne({
+    _id: groceryItemId,
+    groceryListId,
+    houseId,
+  });
+
+  if (!oldGroceryItem) {
+    throw new NotFoundException("Grocery item not found");
+  }
+
+  // if purchasedBy updated or purchasedDate then automatically mark the grocery item as purchased:
+  if ((body.purchasedBy || body.purchasedDate) && !body.isPurchased) {
+    if (body.purchasedBy) {
+      await getMemberRoleInHouse(body.purchasedBy, houseId);
+    }
+    body.isPurchased = true;
+  }
+
+  if (body.purchasedBy && !body.purchasedDate) {
+    body.purchasedDate = new Date().toISOString();
+  }
+
+  const updatedGroceryItem = await GroceryItemModel.findOneAndUpdate(
+    {
+      _id: groceryItemId,
+      groceryListId,
+      houseId,
+    },
+    {
+      $set: body,
+    },
+    {
+      new: true,
+    }
+  );
+
+  if (!updatedGroceryItem) {
+    throw new BadRequestException("Failed to update grocery item");
+  }
+
+  // update the totalPrice of the list if quantity or ppu has changed
+  if ("quantity" in body || "pricePerUnit" in body) {
+    groceryList.totalPrice -=
+      oldGroceryItem.quantity * oldGroceryItem.pricePerUnit;
+    groceryList.totalPrice +=
+      updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit;
+    groceryList.participants.forEach((p) => {
+      p.amount +=
+        (updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit) /
+        groceryList.participants.length;
+    });
+    await groceryList.save();
+  }
+
+  // update the amount of the participant, who puchased the item, should pay
+  if (body.purchasedBy) {
+    const participant = groceryList.participants.find((p) =>
+      p.participant.equals(new mongoose.Types.ObjectId(body.purchasedBy))
+    );
+
+    if (participant) {
+      participant.amount -=
+        updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit;
+      await groceryList.save();
+    }
+  }
+
+  return {
+    grocery: updatedGroceryItem,
   };
 };
