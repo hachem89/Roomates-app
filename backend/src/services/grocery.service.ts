@@ -16,6 +16,7 @@ import {
   calculateAmountPerParticipantOfBill,
   updateTotalPrice,
 } from "../utils/bill-util";
+import TransactionModel from "../models/transaction.model";
 
 // done
 export const getGroceryListByIdService = async (
@@ -104,6 +105,10 @@ export const deleteGroceryListByIdService = async (
     }
 
     await GroceryItemModel.deleteMany({ groceryListId }).session(session);
+
+    await TransactionModel.deleteMany({ billId: groceryList._id, houseId }).session(
+      session
+    );
 
     await groceryList.deleteOne({ session });
 
