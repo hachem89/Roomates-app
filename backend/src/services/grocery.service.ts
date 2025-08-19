@@ -12,7 +12,10 @@ import {
   addGroceryItemInputType,
   updateGroceryItemInputType,
 } from "../validation/groceryItem.validation";
-import { updateTotalPrice } from "../utils/bill-util";
+import {
+  calculateAmountPerParticipantOfBill,
+  updateTotalPrice,
+} from "../utils/bill-util";
 
 // done
 export const getGroceryListByIdService = async (
@@ -205,15 +208,15 @@ export const addGroceryItemToGroceryListService = async (
   });
   await newItem.save();
 
+  // if the quantity and price per unit are provided from the start:
   // update the totalPrice and amout per participant
-  await updateTotalPrice(groceryList, newItem.quantity * newItem.pricePerUnit);
-
-  groceryList.participants.forEach((p) => {
-    p.amount +=
-      (newItem.quantity * newItem.pricePerUnit) /
-      groceryList.participants.length;
-  });
-  await groceryList.save();
+  if (newItem.quantity && newItem.pricePerUnit) {
+    await updateTotalPrice(
+      groceryList,
+      newItem.quantity * newItem.pricePerUnit
+    );
+    await calculateAmountPerParticipantOfBill(groceryList);
+  }
 
   return {
     grocery: newItem,
@@ -347,7 +350,8 @@ export const updateGroceryItemByIdService = async (
     body.isPurchased = true;
   }
 
-  if (body.purchasedBy && !body.purchasedDate) {
+  // update the purchasedDate if ( purchasedBy is provided or it is purchased )and purchasedDate not provided
+  if ((body.purchasedBy || body.isPurchased) && !body.purchasedDate) {
     body.purchasedDate = new Date().toISOString();
   }
 
@@ -375,25 +379,7 @@ export const updateGroceryItemByIdService = async (
       updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit -
       oldGroceryItem.quantity * oldGroceryItem.pricePerUnit;
     await updateTotalPrice(groceryList, change);
-    groceryList.participants.forEach((p) => {
-      p.amount +=
-        (updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit) /
-        groceryList.participants.length;
-    });
-    await groceryList.save();
-  }
-
-  // update the amount of the participant, who puchased the item, should pay
-  if (body.purchasedBy) {
-    const participant = groceryList.participants.find((p) =>
-      p.participant.equals(new mongoose.Types.ObjectId(body.purchasedBy))
-    );
-
-    if (participant) {
-      participant.amount -=
-        updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit;
-      await groceryList.save();
-    }
+    await calculateAmountPerParticipantOfBill(groceryList);
   }
 
   return {
