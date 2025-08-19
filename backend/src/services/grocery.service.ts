@@ -13,8 +13,9 @@ import {
   updateGroceryItemInputType,
 } from "../validation/groceryItem.validation";
 import {
-  calculateAmountPerParticipantOfBill,
-  updateTotalPrice,
+  // calculateAmountPerParticipantOfBill,
+  // updateTotalPrice,
+  updateTotalPriceAndAmountPerParticipant
 } from "../utils/bill-util";
 import TransactionModel from "../models/transaction.model";
 
@@ -216,11 +217,10 @@ export const addGroceryItemToGroceryListService = async (
   // if the quantity and price per unit are provided from the start:
   // update the totalPrice and amout per participant
   if (newItem.quantity && newItem.pricePerUnit) {
-    await updateTotalPrice(
+    await updateTotalPriceAndAmountPerParticipant(
       groceryList,
       newItem.quantity * newItem.pricePerUnit
     );
-    await calculateAmountPerParticipantOfBill(groceryList);
   }
 
   return {
@@ -383,11 +383,11 @@ export const updateGroceryItemByIdService = async (
     const change =
       updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit -
       oldGroceryItem.quantity * oldGroceryItem.pricePerUnit;
-    await updateTotalPrice(groceryList, change);
-    await calculateAmountPerParticipantOfBill(groceryList);
+    await updateTotalPriceAndAmountPerParticipant(groceryList, change);
   }
 
   return {
     grocery: updatedGroceryItem,
   };
 };
+

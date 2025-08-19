@@ -3,25 +3,25 @@ import { BillCategory } from "../constants/bill-category.constant";
 import { BillDocument } from "../models/bill.model";
 import { GroceryItemDocument } from "../models/groceryItem.model";
 
-export const updateTotalPrice = async (
-  groceryList: BillDocument,
-  price: number
-) => {
-  groceryList.totalPrice += price;
-  await groceryList.save();
-};
+// export const updateTotalPrice = async (
+//   groceryList: BillDocument,
+//   price: number
+// ) => {
+//   groceryList.totalPrice += price;
+//   await groceryList.save();
+// };
 
-// this is when: create, update bill / add, delete participant
-export const calculateAmountPerParticipantOfBill = async (
-  bill: BillDocument
-) => {
-  const billPrice = bill.totalPrice;
-  const numberOfParticipants = bill.participants.length;
-  bill.participants.forEach((p) => {
-    p.amount = billPrice / numberOfParticipants;
-  });
-  await bill.save();
-};
+// // this is when: create, update bill / add, delete participant
+// export const calculateAmountPerParticipantOfBill = async (
+//   bill: BillDocument
+// ) => {
+//   const billPrice = bill.totalPrice;
+//   const numberOfParticipants = bill.participants.length;
+//   bill.participants.forEach((p) => {
+//     p.amount = billPrice / numberOfParticipants;
+//   });
+//   await bill.save();
+// };
 
 // this is not necessary
 // this is when:
@@ -61,3 +61,20 @@ export const calculateAmountPerParticipantOfBill = async (
 //     await groceryList.save();
 //   }
 // };
+
+
+export const updateTotalPriceAndAmountPerParticipant = async (
+  bill: BillDocument,
+  price: number
+) => {
+  bill.totalPrice += price;
+
+  const billPrice = bill.totalPrice;
+  const numberOfParticipants = bill.participants.length;
+  
+  bill.participants.forEach((p) => {
+    p.amount = billPrice / numberOfParticipants;
+  });
+
+  await bill.save();
+};
