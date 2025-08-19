@@ -15,7 +15,7 @@ import {
 import {
   // calculateAmountPerParticipantOfBill,
   // updateTotalPrice,
-  updateTotalPriceAndAmountPerParticipant
+  updateTotalPriceAndAmountPerParticipant,
 } from "../utils/bill-util";
 import TransactionModel from "../models/transaction.model";
 
@@ -107,9 +107,10 @@ export const deleteGroceryListByIdService = async (
 
     await GroceryItemModel.deleteMany({ groceryListId }).session(session);
 
-    await TransactionModel.deleteMany({ billId: groceryList._id, houseId }).session(
-      session
-    );
+    await TransactionModel.deleteMany({
+      billId: groceryList._id,
+      houseId,
+    }).session(session);
 
     await groceryList.deleteOne({ session });
 
@@ -391,3 +392,35 @@ export const updateGroceryItemByIdService = async (
   };
 };
 
+export const deleteGroceryItemByIdService = async (
+  groceryItemId: string,
+  groceryListId: string,
+  houseId: string
+) => {
+  const groceryList = await BillModel.findOne({
+    _id: groceryListId,
+    category: BillCategory.GROCERY_LIST,
+    houseId,
+  });
+
+  if (!groceryList) {
+    throw new NotFoundException("Grocery list not found or wrong house");
+  }
+
+  const groceryItem = await GroceryItemModel.findOne({
+    _id: groceryItemId,
+    groceryListId,
+    houseId,
+  });
+
+  if (!groceryItem) {
+    throw new NotFoundException("Grocery item not found");
+  }
+
+  await updateTotalPriceAndAmountPerParticipant(
+    groceryList,
+    -(groceryItem.quantity * groceryItem.pricePerUnit)
+  );
+
+  await groceryItem.deleteOne();
+};

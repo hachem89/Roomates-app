@@ -13,6 +13,7 @@ import { HTTPSTATUS } from "../constants/httpStatus.constant";
 import {
   addGroceryItemToGroceryListService,
   createGroceryListService,
+  deleteGroceryItemByIdService,
   deleteGroceryListByIdService,
   getAllGroceriesOfGroceryListService,
   getAllGroceriesOfHouseService,
@@ -244,7 +245,7 @@ export const addGroceryItemToGroceryListController = asyncHandler(
 
 export const updateGroceryItemByIdController = asyncHandler(
   async (req: Request, res: Response) => {
-    const body = updateGroceryItemSchema.parse(req.body)
+    const body = updateGroceryItemSchema.parse(req.body);
     const groceryItemId = groceryItemIdSchema.parse(req.params.groceryItemId);
     const houseId = houseIdSchema.parse(req.params.houseId);
     const groceryListId = billIdSchema.parse(req.params.groceryListId);
@@ -268,5 +269,19 @@ export const updateGroceryItemByIdController = asyncHandler(
 );
 
 export const deleteGroceryItemByIdController = asyncHandler(
-  async (req: Request, res: Response) => {}
+  async (req: Request, res: Response) => {
+    const groceryItemId = groceryItemIdSchema.parse(req.params.groceryItemId);
+    const groceryListId = billIdSchema.parse(req.params.groceryListId);
+    const houseId = houseIdSchema.parse(req.params.houseId);
+    const userId = req.user?._id;
+
+    const { role } = await getMemberRoleInHouse(userId, houseId);
+    roleGuard(role, [Permissions.DELETE_GROCERY_ITEM]);
+
+    await deleteGroceryItemByIdService(groceryItemId, groceryListId, houseId);
+
+    return res.status(HTTPSTATUS.OK).json({
+      message: "Grocery item deleted successfully",
+    });
+  }
 );
