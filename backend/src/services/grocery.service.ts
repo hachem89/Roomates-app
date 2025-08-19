@@ -12,6 +12,7 @@ import {
   addGroceryItemInputType,
   updateGroceryItemInputType,
 } from "../validation/groceryItem.validation";
+import { updateTotalPrice } from "../utils/bill-util";
 
 // done
 export const getGroceryListByIdService = async (
@@ -205,7 +206,7 @@ export const addGroceryItemToGroceryListService = async (
   await newItem.save();
 
   // update the totalPrice and amout per participant
-  groceryList.totalPrice += newItem.quantity * newItem.pricePerUnit;
+  await updateTotalPrice(groceryList, newItem.quantity * newItem.pricePerUnit);
 
   groceryList.participants.forEach((p) => {
     p.amount +=
@@ -270,7 +271,6 @@ export const getAllGroceriesOfHouseService = async (
 
   // sortBy can be "name", "totalQuantity", "totalSpent"
   // sortOrder is "1" (asc) or "-1" (desc)
-
   const { sortBy = "name", sortOrder = "asc" } = filters;
 
   const sortFieldMap: Record<string, string> = {
@@ -371,10 +371,10 @@ export const updateGroceryItemByIdService = async (
 
   // update the totalPrice of the list if quantity or ppu has changed
   if ("quantity" in body || "pricePerUnit" in body) {
-    groceryList.totalPrice -=
+    const change =
+      updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit -
       oldGroceryItem.quantity * oldGroceryItem.pricePerUnit;
-    groceryList.totalPrice +=
-      updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit;
+    await updateTotalPrice(groceryList, change);
     groceryList.participants.forEach((p) => {
       p.amount +=
         (updatedGroceryItem.quantity * updatedGroceryItem.pricePerUnit) /
